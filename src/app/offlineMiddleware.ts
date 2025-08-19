@@ -17,5 +17,4 @@ const offlineMiddleware = (store: MiddlewareAPI) => (next: Dispatch) => (action:
   
   return next(action);
 };
-
 export default offlineMiddleware;

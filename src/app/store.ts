@@ -8,6 +8,7 @@ import userPreferencesReducer from '../features/user/userSlice';
 // import { offline } from '@redux-offline/redux-offline';
 // import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
 import { configureStore, Tuple } from '@reduxjs/toolkit';
+import offlineReducer from '../features/offline/offlineSlice';
 import type { Middleware } from '@reduxjs/toolkit';
 
 const customMiddleware: Middleware = (store) => (next) => (action) => {
@@ -25,6 +26,7 @@ export const store = configureStore({
     notifications: notificationsReducer,
     achievements: achievementsReducer,
     userPreferences: userPreferencesReducer,
+    offline: offlineReducer,
   },
   middleware: (getDefaultMiddleware) =>
     new Tuple(...getDefaultMiddleware(), customMiddleware)

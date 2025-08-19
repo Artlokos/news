@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchNews, selectAllNews } from '../news/newsSlice';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { fetchNews, selectAllNews } from './newsSlice';
 import NewsItem from './NewsItem';
 import AddNewsForm from '../../components/AddNewsForm';
+import type {RootState} from "../../app/store.ts";
 
 const NewsFeed = () => {
-  const dispatch = useDispatch();
-  const news = useSelector(selectAllNews);
-  const status = useSelector((state: RootState) => state.news.status);
+  const dispatch = useAppDispatch();
+  const news = useAppSelector(selectAllNews);
+  const status = useAppSelector((state: RootState) => state.news.status);
 
   useEffect(() => {
     if (status === 'idle') {

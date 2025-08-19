@@ -1,8 +1,9 @@
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { RootState } from '../app/store';
+import { ReactNode } from "react";
 
-const ProtectedRoute = ({ children, roles }: { children: JSX.Element, roles?: string[] }) => {
+const ProtectedRoute = ({ children, roles }: { children: ReactNode, roles?: string[] }) => {
   const { user } = useSelector((state: RootState) => state.auth);
   
   if (!user) {

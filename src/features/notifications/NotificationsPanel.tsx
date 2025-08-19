@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchNotifications, markAsRead } from '../features/notifications/notificationSlice';
+import { fetchNotifications, markAsRead } from './notificationSlice';
+import { RootState } from '../../app/store';
 
 const NotificationsPanel = () => {
   const dispatch = useDispatch();

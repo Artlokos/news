@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { RootState } from '../../app/store';
 
 const ProfilePage = () => {
   const { user } = useSelector((state: RootState) => state.auth);

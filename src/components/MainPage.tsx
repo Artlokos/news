@@ -2,6 +2,7 @@ import { useSelector } from 'react-redux';
 import NewsFeed from '../features/news/NewsFeed';
 import NotificationsPanel from '../features/notifications/NotificationsPanel';
 import UserSettings from '../features/user/UserSettings';
+import type {RootState} from "../app/store.ts";
 
 const MainPage = () => {
   const { user } = useSelector((state: RootState) => state.auth);
