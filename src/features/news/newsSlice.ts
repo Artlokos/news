@@ -28,15 +28,21 @@ const initialState: NewsState = {
   error: null,
 };
 
-export const fetchNews = createAsyncThunk('news/fetchAll', async () => {
-  const response = await api.getNews();
-  return response.data;
-});
+export const fetchNews = createAsyncThunk<NewsItem[], void, { state: RootState }>(
+    'news/fetchAll',
+    async () => {
+      const response = await api.getNews();
+      return response.data;
+    }
+);
 
-export const addNews = createAsyncThunk('news/add', async (newsItem: Omit<NewsItem, 'id'>) => {
-  const response = await api.createNews(newsItem);
-  return response.data;
-});
+export const addNews = createAsyncThunk<NewsItem, Omit<NewsItem, 'id'>, { state: RootState }>(
+    'news/add',
+    async (newsItem) => {
+      const response = await api.createNews(newsItem);
+      return response.data;
+    }
+);
 
 const newsSlice = createSlice({
   name: 'news',
@@ -51,30 +57,31 @@ const newsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchNews.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(fetchNews.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        action.payload.forEach(newsItem => {
-          state.entities[newsItem.id] = newsItem;
-          if (!state.ids.includes(newsItem.id)) {
-            state.ids.push(newsItem.id);
-          }
+        .addCase(fetchNews.pending, (state) => {
+          state.status = 'loading';
+        })
+        .addCase(fetchNews.fulfilled, (state, action) => {
+          state.status = 'succeeded';
+          action.payload.forEach((newsItem: NewsItem) => { // Явно указываем тип
+            state.entities[newsItem.id] = newsItem;
+            if (!state.ids.includes(newsItem.id)) {
+              state.ids.push(newsItem.id);
+            }
+          });
+        })
+        .addCase(fetchNews.rejected, (state, action) => {
+          state.status = 'failed';
+          state.error = action.error.message || 'Unknown error';
+        })
+        .addCase(addNews.fulfilled, (state, action) => {
+          state.entities[action.payload.id] = action.payload;
+          state.ids.unshift(action.payload.id);
         });
-      })
-      .addCase(fetchNews.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.error.message || null;
-      })
-      .addCase(addNews.fulfilled, (state, action) => {
-        state.entities[action.payload.id] = action.payload;
-        state.ids.unshift(action.payload.id);
-      });
   },
 });
 
 export const { rateNews } = newsSlice.actions;
 export default newsSlice.reducer;
-export const selectAllNews = (state: RootState) => 
-  state.news.ids.map(id => state.news.entities[id]);
+
+export const selectAllNews = (state: RootState) =>
+    state.news.ids.map(id => state.news.entities[id]);

@@ -1,7 +1,11 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../../app/store';
 
-const NewsStats = ({ newsId }) => {
+interface NewsStatsProps {
+    newsId: string | number;
+}
+
+const NewsStats = ({ newsId="defaultId" }: NewsStatsProps) => {
   const stats = useSelector((state: RootState) => 
     state.analytics.viewStats[newsId] || { views: 0, averageDuration: 0 });
   const rating = useSelector((state: RootState) => 

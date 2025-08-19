@@ -1,6 +1,6 @@
 import { useState,useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { addComment, fetchComments } from './commentsSlice.ts';
+import { addComment, fetchComments } from './commentsSlice';
 import { RootState } from '../../app/store';
 
 const CommentsSection = ({ newsId }) => {

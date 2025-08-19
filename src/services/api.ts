@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {NewsItem} from '../features/news/NewsItem';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,

@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { rateNews } from '../news/newsSlice';
+import { useAppDispatch } from '../../app/hooks';
+import { rateNews } from './newsSlice';
 import CommentsSection from '../comments/CommentsSection';
+import {useDispatch} from "react-redux";
 
 const NewsItem = ({ item }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [expanded, setExpanded] = useState(false);
 
   const handleRate = (value: number) => {
