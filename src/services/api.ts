@@ -1,5 +1,8 @@
 import axios from 'axios';
-import {NewsItem} from '../features/news/NewsItem';
+// import {NewsItem} from '../features/news/NewsItem';
+import type { NewsItem } from '../features/news/newsSlice';
+import type { Comment } from '../features/comments/commentsSlice';
+
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,

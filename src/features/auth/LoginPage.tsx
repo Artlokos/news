@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { setCredentials } from '../auth/authSlice';
+import { setCredentials } from './authSlice';
 import api from '../../services/api';
 
 const LoginPage = () => {

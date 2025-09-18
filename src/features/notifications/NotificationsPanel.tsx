@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchNotifications, markAsRead } from './notificationSlice';
 import { RootState } from '../../app/store';
+import type {AnyAction} from "@reduxjs/toolkit";
 
 const NotificationsPanel = () => {
   const dispatch = useDispatch();
@@ -9,7 +10,7 @@ const NotificationsPanel = () => {
   const unreadCount = items.filter(n => !n.read).length;
 
   useEffect(() => {
-    dispatch(fetchNotifications());
+    dispatch(fetchNotifications() as unknown as AnyAction);
   }, [dispatch]);
 
   const handleMarkAsRead = (id: string) => {

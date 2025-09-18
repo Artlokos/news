@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import api from '../../services/api';
 import { RootState } from '../../app/store';
 
-interface NewsItem {
+export interface NewsItem {
   id: string;
   title: string;
   content: string;

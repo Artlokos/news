@@ -2,7 +2,12 @@
 import React, { useState } from 'react';
 import { useAppDispatch} from "../app/hooks";
 import { addNews } from '../features/news/newsSlice';
-import NewsItem from "../features/news/NewsItem";
+import type { NewsItem as NewsItemType } from "../features/news/newsSlice";
+import type {AnyAction} from "@reduxjs/toolkit"; // Импортируем тип
+
+interface NewsItemProps {
+    item: NewsItemType; // Явно указываем тип для item
+}
 interface NewsFormData {
     title: string;
     content: string;
@@ -19,7 +24,7 @@ const AddNewsForm = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const newsData: Omit<NewsItem, 'id'> = {
+        const newsData: Omit<NewsItemType, 'id'> = {
             title,
             content,
             date: new Date().toISOString(),
@@ -30,7 +35,7 @@ const AddNewsForm = () => {
             views: 0
         };
 
-        dispatch(addNews(newsData));
+        dispatch(addNews(newsData) as unknown as AnyAction);
         setTitle('');
         setContent('');
     };

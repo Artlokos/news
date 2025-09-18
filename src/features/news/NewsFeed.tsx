@@ -4,6 +4,7 @@ import { fetchNews, selectAllNews } from './newsSlice';
 import NewsItem from './NewsItem';
 import AddNewsForm from '../../components/AddNewsForm';
 import type {RootState} from "../../app/store.ts";
+import type {AnyAction} from "@reduxjs/toolkit";
 
 const NewsFeed = () => {
   const dispatch = useAppDispatch();
@@ -12,7 +13,7 @@ const NewsFeed = () => {
 
   useEffect(() => {
     if (status === 'idle') {
-      dispatch(fetchNews());
+      dispatch(fetchNews() as unknown as AnyAction);
     }
   }, [status, dispatch]);
 

@@ -1,52 +1,58 @@
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addComment, fetchComments } from './commentsSlice';
 import { RootState } from '../../app/store';
+import type { AnyAction } from "@reduxjs/toolkit";
 
-const CommentsSection = ({ newsId }) => {
+// Правильный интерфейс для пропсов компонента
+interface CommentsSectionProps {
+  newsId: string;
+}
+
+const CommentsSection = ({ newsId }: CommentsSectionProps) => {
   const dispatch = useDispatch();
-  const comments = useSelector((state: RootState) => 
-    state.comments.byNewsId[newsId] || []);
+  const comments = useSelector((state: RootState) =>
+      state.comments.byNewsId[newsId] || []);
   const [commentText, setCommentText] = useState('');
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    dispatch(fetchComments(newsId));
+    dispatch(fetchComments(newsId) as unknown as AnyAction);
   }, [newsId, dispatch]);
 
   const handleSubmit = () => {
     if (commentText.trim() && user) {
-      dispatch(addComment({ newsId, text: commentText }));
+      dispatch(addComment({ newsId, text: commentText }) as unknown as AnyAction);
       setCommentText('');
     }
   };
 
   return (
-    <div className="comments-section">
-      <h4>Комментарии ({comments.length})</h4>
-      {user ? (
-        <>
+      <div className="comments-section">
+        <h4>Комментарии ({comments.length})</h4>
+        {user ? (
+            <>
           <textarea
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Оставьте комментарий..."
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Оставьте комментарий..."
           />
-          <button onClick={handleSubmit}>Отправить</button>
-        </>
-      ) : (
-        <p>Войдите, чтобы оставить комментарий</p>
-      )}
-      <div className="comments-list">
-        {comments
-          .filter(c => c.status === 'approved')
-          .map(comment => (
-            <div key={comment.id} className="comment">
-              <p>{comment.text}</p>
-              <small>{new Date(comment.createdAt).toLocaleString()}</small>
-            </div>
-          ))}
+              <button onClick={handleSubmit}>Отправить</button>
+            </>
+        ) : (
+            <p>Войдите, чтобы оставить комментарий</p>
+        )}
+        <div className="comments-list">
+          {comments
+              .filter(c => c.status === 'approved')
+              .map(comment => (
+                  <div key={comment.id} className="comment">
+                    <p>{comment.text}</p>
+                    <small>{new Date(comment.createdAt).toLocaleString()}</small>
+                  </div>
+              ))}
+        </div>
       </div>
-    </div>
   );
 };
 
