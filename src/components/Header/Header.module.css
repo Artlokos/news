@@ -1,0 +1,10 @@
+.header{
+    display: grid;
+    grid-template-areas: 
+    "logo auth"
+    "slogan auth";
+    align-content: center;
+    justify-content: space-between;
+    padding:0 1rem;   
+}
+

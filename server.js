@@ -12,6 +12,7 @@ import { body, validationResult } from 'express-validator';
 import rateLimit from 'express-rate-limit';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import session from 'express-session';
 
 // Получаем __dirname в ES модулях
 const __filename = fileURLToPath(import.meta.url);
@@ -29,8 +30,8 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
 // Модели MongoDB
 const userSchema = new mongoose.Schema({
@@ -60,6 +61,163 @@ const User = mongoose.model('User', userSchema);
 const News = mongoose.model('News', newsSchema);
 const Comment = mongoose.model('Comment', commentSchema);
 
+// Динамический импорт AdminJS для решения проблем с CommonJS/ESM
+let adminRouter;
+const initializeAdminJS = async () => {
+  try {
+    // Импортируем как CommonJS модули
+    const AdminJS = (await import('adminjs')).default;
+    const AdminJSExpress = (await import('@adminjs/express')).default;
+    const AdminJSMongoose = (await import('@adminjs/mongoose')).default;
+
+    // Настройка AdminJS
+    AdminJS.registerAdapter(AdminJSMongoose);
+
+    const adminOptions = {
+      resources: [
+        {
+          resource: User,
+          options: {
+            properties: {
+              password: {
+                type: 'string',
+                isVisible: {
+                  list: false,
+                  edit: true,
+                  filter: false,
+                  show: false,
+                },
+              },
+              role: {
+                availableValues: [
+                  { value: 'user', label: 'User' },
+                  { value: 'admin', label: 'Admin' }
+                ]
+              }
+            },
+            actions: {
+              new: {
+                before: async (request) => {
+                  return request;
+                }
+              }
+            }
+          }
+        },
+        {
+          resource: News,
+          options: {
+            properties: {
+              title: {
+                type: 'string',
+                isRequired: true
+              },
+              content: {
+                type: 'textarea',
+                isRequired: true
+              },
+              category: {
+                availableValues: [
+                  { value: 'politics', label: 'Politics' },
+                  { value: 'sports', label: 'Sports' },
+                  { value: 'tech', label: 'Technology' }
+                ]
+              },
+              date: {
+                type: 'datetime',
+                isVisible: {
+                  list: true,
+                  edit: true,
+                  filter: true,
+                  show: true,
+                }
+              }
+            }
+          }
+        },
+        {
+          resource: Comment,
+          options: {
+            properties: {
+              text: {
+                type: 'textarea',
+                isRequired: true
+              },
+              status: {
+                availableValues: [
+                  { value: 'pending', label: 'Pending' },
+                  { value: 'approved', label: 'Approved' },
+                  { value: 'rejected', label: 'Rejected' }
+                ]
+              },
+              createdAt: {
+                type: 'datetime',
+                isVisible: {
+                  list: true,
+                  edit: false,
+                  filter: true,
+                  show: true,
+                }
+              },
+              reported: {
+                type: 'boolean',
+                isVisible: {
+                  list: true,
+                  edit: true,
+                  filter: true,
+                  show: true,
+                }
+              }
+            },
+            listProperties: ['text', 'status', 'reported', 'createdAt', 'userId', 'newsId'],
+            filterProperties: ['status', 'reported', 'createdAt']
+          }
+        }
+      ],
+      branding: {
+        companyName: 'News Portal Admin',
+        logo: false,
+        withMadeWithLove: false
+      },
+      locale: {
+        translations: {
+          labels: {
+            User: 'Пользователи',
+            News: 'Новости',
+            Comment: 'Комментарии'
+          },
+          properties: {
+            username: 'Имя пользователя',
+            password: 'Пароль',
+            role: 'Роль',
+            title: 'Заголовок',
+            content: 'Содержание',
+            category: 'Категория',
+            date: 'Дата публикации',
+            authorId: 'Автор',
+            text: 'Текст комментария',
+            status: 'Статус',
+            createdAt: 'Дата создания',
+            reported: 'Жалоба',
+            newsId: 'Новость',
+            userId: 'Пользователь'
+          }
+        }
+      },
+      rootPath: '/admin',
+    };
+
+    const adminJS = new AdminJS(adminOptions);
+
+    // Без аутентификации (для разработки)
+    adminRouter = AdminJSExpress.buildRouter(adminJS);
+
+    console.log('AdminJS успешно инициализирован');
+  } catch (error) {
+    console.error('Ошибка инициализации AdminJS:', error);
+  }
+};
+
 // Middleware
 app.use(helmet());
 app.use(cors());
@@ -86,12 +244,12 @@ if (!JWT_SECRET) {
 const validate = validations => {
   return async (req, res, next) => {
     await Promise.all(validations.map(validation => validation.run(req)));
-    
+
     const errors = validationResult(req);
     if (errors.isEmpty()) {
       return next();
     }
-    
+
     res.status(400).json({ errors: errors.array() });
   };
 };
@@ -99,7 +257,7 @@ const validate = validations => {
 // Middleware проверки JWT
 const authenticateJWT = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
-  
+
   if (token) {
     jwt.verify(token, JWT_SECRET, (err, user) => {
       if (err) {
@@ -135,7 +293,7 @@ app.post('/api/news', authenticateJWT, validate([
       category: req.body.category,
       authorId: req.user.id
     });
-    
+
     await newsItem.save();
     res.status(201).json(newsItem);
   } catch (err) {
@@ -149,11 +307,11 @@ app.get('/api/comments/pending', authenticateJWT, async (req, res, next) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Доступ запрещен' });
     }
-    
+
     const comments = await Comment.find({ status: 'pending' })
-      .populate('userId', 'username')
-      .populate('newsId', 'title');
-      
+        .populate('userId', 'username')
+        .populate('newsId', 'title');
+
     res.json(comments);
   } catch (err) {
     next(err);
@@ -171,7 +329,7 @@ app.post('/api/comments', authenticateJWT, validate([
       userId: req.user.id,
       status: req.user.role === 'admin' ? 'approved' : 'pending'
     });
-    
+
     await comment.save();
     res.status(201).json(comment);
   } catch (err) {
@@ -186,22 +344,40 @@ app.patch('/api/comments/:id/moderate', authenticateJWT, validate([
     if (req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Доступ запрещен' });
     }
-    
+
     const comment = await Comment.findByIdAndUpdate(
-      req.params.id,
-      { status: req.body.status },
-      { new: true }
+        req.params.id,
+        { status: req.body.status },
+        { new: true }
     );
-    
+
     if (!comment) {
       return res.status(404).json({ message: 'Комментарий не найден' });
     }
-    
+
     res.json(comment);
   } catch (err) {
     next(err);
   }
 });
+
+// Создание тестового администратора (если не существует)
+const createTestAdmin = async () => {
+  try {
+    const existingAdmin = await User.findOne({ username: 'admin', role: 'admin' });
+    if (!existingAdmin) {
+      const adminUser = new User({
+        username: 'admin',
+        password: 'admin123',
+        role: 'admin'
+      });
+      await adminUser.save();
+      console.log('Тестовый администратор создан: admin / admin123');
+    }
+  } catch (error) {
+    console.error('Ошибка создания тестового администратора:', error);
+  }
+};
 
 // Обработка ошибок
 app.use((err, req, res, next) => {
@@ -215,6 +391,25 @@ app.use((req, res) => {
 });
 
 // Запуск сервера
-https.createServer(httpsOptions, app).listen(process.env.PORT || 5000, () => {
-  console.log(`HTTPS сервер запущен на порту ${process.env.PORT || 5000}`);
-});
+const startServer = async () => {
+  await initializeAdminJS();
+
+  // Подключаем AdminJS роутер после инициализации
+  if (adminRouter) {
+    app.use('/admin', adminRouter);
+    console.log('AdminJS маршрут подключен');
+  } else {
+    console.log('AdminJS не был инициализирован, маршрут /admin недоступен');
+  }
+
+  await createTestAdmin();
+
+  https.createServer(httpsOptions, app).listen(process.env.PORT || 5000, () => {
+    console.log(`HTTPS сервер запущен на порту ${process.env.PORT || 5000}`);
+    if (adminRouter) {
+      console.log(`AdminJS доступен по адресу: https://localhost:${process.env.PORT || 5000}/admin`);
+    }
+  });
+};
+
+startServer().catch(console.error);

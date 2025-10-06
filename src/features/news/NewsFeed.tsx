@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { fetchNews, selectAllNews } from './newsSlice';
 import NewsItem from './NewsItem';
-import AddNewsForm from '../../components/AddNewsForm';
-import type {RootState} from "../../app/store.ts";
+import AddNewsForm from '../../components/addNewsForm/AddNewsForm';
+import type {RootState} from "../../app/store";
 import type {AnyAction} from "@reduxjs/toolkit";
 
 const NewsFeed = () => {

@@ -1,0 +1,32 @@
+.navbar{
+    display: flex;
+    margin: 1rem 0;
+}
+.nav_list{
+    display: flex;
+    gap:2.5rem;
+    font-size: 1.5rem;
+    margin: 0 auto;
+    justify-items: center;
+    justify-content: center;
+}
+.nav_list a {
+    color:var(--text_color);
+}
+
+.nav_item{
+    min-width: 10rem;
+    text-align: center;
+    background-color: var(--card_back);
+    padding:1rem;
+    border-radius: 1rem;
+    box-shadow: 8px 8px 8px var(--card_shadow);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.nav_item:hover {
+    color: var(--logo_color);
+     transform: translateY(-5px);
+  transform: scale(1.05);
+  box-shadow: 6px 6px 12px var(--card_shadow_hover);
+}

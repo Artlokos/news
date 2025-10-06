@@ -3,6 +3,7 @@ import { useAppDispatch } from '../../app/hooks';
 import { rateNews } from './newsSlice';
 import CommentsSection from '../comments/CommentsSection';
 import type { NewsItem as NewsItemType } from './newsSlice'; // Импортируем тип
+import './newsItem.css';
 
 interface NewsItemProps {
     item: NewsItemType; // Явно указываем тип для item

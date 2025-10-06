@@ -10,7 +10,7 @@ self.addEventListener('install', (event) => {
           '/index.html',
           OFFLINE_URL,
           '/static/js/main.js',
-          '/static/css/main.css',
+          '/static/css/NewsPage.css',
         ]);
       })
   );

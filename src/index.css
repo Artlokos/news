@@ -1,8 +1,9 @@
 :root {
   --primary-color: #4285f4;
-  --text-color: #333;
-  --bg-color: #fff;
+  --text-color: #ffffff;
+  --bg-color: #010826;
   --border-color: #ddd;
+  /*border:1px solid red;*/
 }
 
 [data-theme="dark"] {
@@ -12,16 +13,25 @@
   --border-color: #5f6368;
 }
 
+*{
+  /*border:1px solid green;*/
+}
+
 body {
-  margin: 0;
+  margin: 0 auto;
   font-family: 'Roboto', sans-serif;
   color: var(--text-color);
   background-color: var(--bg-color);
+  border: 1px solid red;
+  max-inline-size: 1920px;
+  max-width: 1920px;
+
 }
 
 .app {
   display: flex;
   min-height: 100vh;
+  /*inline-size: 120px;*/
 }
 
 .news-item {
@@ -33,9 +43,10 @@ body {
 
 button {
   background-color: var(--primary-color);
+  block-size: 50px;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 15px;
   cursor: pointer;
 }

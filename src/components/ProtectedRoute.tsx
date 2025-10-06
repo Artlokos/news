@@ -16,5 +16,4 @@ const ProtectedRoute = ({ children, roles }: { children: ReactNode, roles?: stri
 
   return children;
 };
-
 export default ProtectedRoute;

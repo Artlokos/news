@@ -5,14 +5,13 @@ import analyticsReducer from '../features/analytics/analyticsSlice';
 import notificationsReducer from '../features/notifications/notificationSlice';
 import achievementsReducer from '../features/gamification/achievementsSlice';
 import userPreferencesReducer from '../features/user/userSlice';
-// import { offline } from '@redux-offline/redux-offline';
-// import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
+import { offline } from '@redux-offline/redux-offline';
+import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
 import { configureStore, Tuple } from '@reduxjs/toolkit';
 import offlineReducer from '../features/offline/offlineSlice';
 import type { Middleware } from '@reduxjs/toolkit';
 
 const customMiddleware: Middleware = (store) => (next) => (action) => {
-  // Ваша логика middleware
   store.getState();
   return next(action);
 };

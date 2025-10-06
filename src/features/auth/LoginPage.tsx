@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from './authSlice';
 import api from '../../services/api';
+import './LoginPage.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -19,23 +20,35 @@ const LoginPage = () => {
   };
 
   return (
+
     <div className="login-container">
-      <form onSubmit={handleSubmit}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Войти</button>
+      <h1 className={'header1'}>Pulsar</h1>
+      <h2 className={'header2'}>пульс этого города</h2>
+      <form className={'login-form'} onSubmit={handleSubmit}>
+        <div className="input-container">
+          <input
+              type="email"
+              className="custom-input floating-input"
+              placeholder=" "
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+          />
+            <label className="floating-label">E-mail</label>
+        </div>
+
+        <div className="input-container">
+          <input
+              type="password"
+              className="custom-input floating-input"
+              placeholder=" "
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+          />
+          <label className="floating-label">Password</label>
+        </div>
+        <button className={'submit-button'} type="submit">Войти</button>
       </form>
     </div>
   );
